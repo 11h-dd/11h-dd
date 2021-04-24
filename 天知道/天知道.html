@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <title>天知道</title>
+    <link rel="stylesheet" href="css/reset.css" />
+    <link rel="stylesheet" href="css/main2.css" />
+    <script src="https://cdn.bootcdn.net/ajax/libs/art-template/4.13.2/lib/template-web.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
+
+    <style>
+        .tem .iconfont {
+            font-size: 50px;
+        }
+        
+        table {
+            width: 600px;
+            border-collapse: collapse;
+            margin: 20px auto;
+        }
+        
+        td,
+        th {
+            height: 50px;
+            text-align: center;
+            border: 1px solid #CCC;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <div class="search_form">
+            <div class="logo"><img src="img/logo.png" alt="logo" /></div>
+            <div class="form_group">
+                <input type="text" class="input_txt" placeholder="请输入查询的天气" />
+                <button class="input_sub">搜 索</button>
+            </div>
+            <div class="hotkey">
+                <a href="javascript:;">北京</a>
+                <a href="javascript:;">上海</a>
+                <a href="javascript:;">广州</a>
+                <a href="javascript:;">深圳</a>
+            </div>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>日期</th>
+                    <th>高温</th>
+                    <th>低温</th>
+                    <th>风向</th>
+                    <th>天气</th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- 模板 -->
+                <!-- <tr>
+          <td>5月15日星期五</td>
+          <td>25℃</td>
+          <td>15℃</td>
+          <td>东南风</td>
+          <td>多云</td>
+        </tr> -->
+            </tbody>
+        </table>
+    </div>
+    <script type="text/html" id="a">
+
+        <tr>
+            <td> 4月{{date}}</td>
+            <td>{{high}}</td>
+            <td>{{low}}</td>
+            <td>{{fx}}</td>
+            <td>{{type}}</td>
+        </tr>
+
+    </script>
+    <script>
+        var btn = document.querySelector('.input_sub'); //点击框
+        var ipt = document.querySelector('.input_txt'); //文本框\
+
+        var a = document.querySelectorAll('a');
+        for (let i = 0; i < a.length; i++) {
+            a[i].addEventListener('click', function() {
+                ipt.value = a[i].innerHTML
+                render()
+            })
+
+        }
+        btn.addEventListener('click', function() {
+            if (ipt.value.trim() == '') {
+                alert('请输入内容');
+                return
+            }
+            render()
+            ipt.value = ''
+        })
+
+        //渲染
+        function render() {
+            axios({
+                url: 'http://wthrcdn.etouch.cn/weather_mini',
+                params: {
+                    city: ipt.value
+                },
+                method: 'get'
+            }).then(function(res) {
+                console.log(res)
+                document.querySelector('tbody').innerHTML += template('a', res.data.data.yesterday)
+            })
+        }
+    </script>
+</body>
+
+
+</html>

@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="./lib/bootstrap.css" />
+    <script src="./lib/jquery.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/art-template/4.13.2/lib/template-web.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/axios/0.21.1/axios.min.js"></script>
+</head>
+
+<body style="padding: 15px;">
+    <!-- 添加图书的Panel面板 -->
+    <div class="panel panel-primary">
+        <div class="panel-heading">
+            <h3 class="panel-title">添加新图书</h3>
+        </div>
+        <div class="panel-body form-inline">
+
+            <div class="input-group">
+                <div class="input-group-addon">书名</div>
+                <input type="text" class="form-control" id="iptBookname" placeholder="请输入书名">
+            </div>
+
+            <div class="input-group">
+                <div class="input-group-addon">作者</div>
+                <input type="text" class="form-control" id="iptAuthor" placeholder="请输入作者">
+            </div>
+
+            <div class="input-group">
+                <div class="input-group-addon">出版社</div>
+                <input type="text" class="form-control" id="iptPublisher" placeholder="请输入出版社">
+            </div>
+
+            <button id="btnAdd" class="btn btn-primary">添加</button>
+
+        </div>
+    </div>
+
+
+    <!-- 图书的表格 -->
+    <table class="table table-bordered table-hover">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>书名</th>
+                <th>作者</th>
+                <th>出版社</th>
+                <th>操作</th>
+            </tr>
+        </thead>
+        <tbody id="tb">
+            <!-- 模板 -->
+            <!-- <tr>
+        <td>1</td>
+        <td>红楼梦</td>
+        <td>曹雪芹</td>
+        <td>新华出版社</td>
+        <td><a href="javascript:;" class="del">删除</a></td>
+      </tr> -->
+        </tbody>
+    </table>
+    <script type="text/html" id="a">
+        {{each}}
+        <tr>
+            <td>{{$value.id}}</td>
+            <td>{{$value.bookname}}</td>
+            <td>{{$value.author}}</td>
+            <td>{{$value.publisher}}</td>
+            <td><a href="javascript:;" class="del">删除</a></td>
+        </tr> {{/each}}
+
+    </script>
+    <script>
+        btnAdd.addEventListener('click', function() {
+            if (iptBookname.value.trim() == '') {
+                alert('请输入书名')
+                return
+            }
+            if (iptAuthor.value.trim() == '') {
+                alert('请输入作者')
+                return
+            }
+            if (iptPublisher.value.trim() == '') {
+                alert('请输入出版社')
+                return
+            }
+            axios({
+                url: 'http://www.liulongbin.top:3006/api/addbook',
+                data: {
+                    bookname: iptBookname.value,
+                    author: iptAuthor.value,
+                    publisher: iptPublisher.value
+                },
+                method: 'post'
+            }).then(function(res) {
+                render()
+            })
+
+        })
+        render()
+
+        function render() {
+            axios({
+                url: 'http://www.liulongbin.top:3006/api/getbooks',
+                method: 'get'
+            }).then(function(res) {
+                console.log(res.data)
+                document.querySelector('tbody').innerHTML = template('a', res.data.data)
+                var a = document.querySelectorAll('a');
+                a.forEach(item => {
+                    item.addEventListener('click', function() {
+                        console.log(item.parentNode.parentNode.firstElementChild.innerHTML)
+                        var num = item.parentNode.parentNode.firstElementChild.innerHTML
+                        axios({
+                            url: ' http://www.liulongbin.top:3006/api/delbook',
+                            params: {
+                                id: num
+                            },
+                            method: 'get'
+                        }).then(function(res) {
+                            render()
+                        })
+                    })
+
+                });
+            })
+        }
+    </script>
+
+
+</body>
+
+</html>
